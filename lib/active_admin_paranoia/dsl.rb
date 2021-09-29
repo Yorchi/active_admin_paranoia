@@ -44,7 +44,7 @@ module ActiveAdminParanoia
         end
       end
 
-      member_action :destroy, confirm: proc{ I18n.t('active_admin.batch_actions.delete_confirmation') }, if: proc{ authorized?(ActiveAdmin::Auth::DESTROY, resource_class) && params[:scope] != 'archived' }
+      member_action :destroy, confirm: proc{ I18n.t('active_admin.batch_actions.delete_confirmation') }, if: proc{ authorized?(ActiveAdmin::Auth::DESTROY, resource_class) && params[:scope] != 'archived' } do
         resource.destroy
         options = { notice: I18n.t('active_admin.batch_actions.succesfully_destroyed', count: 1, model: resource_class.to_s.camelize.constantize.model_name) }
         # For more info, see here: https://github.com/rails/rails/pull/22506
