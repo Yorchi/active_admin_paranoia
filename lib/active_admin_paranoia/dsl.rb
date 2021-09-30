@@ -44,6 +44,17 @@ module ActiveAdminParanoia
         end
       end
 
+      member_action :destroy, confirm: proc{ I18n.t('active_admin.batch_actions.delete_confirmation') }, if: proc{ authorized?(ActiveAdmin::Auth::DESTROY, resource_class) && params[:scope] != 'archived' } do
+        resource.destroy
+        options = { notice: I18n.t('active_admin.batch_actions.succesfully_destroyed', count: 1, model: resource_class.to_s.camelize.constantize.model_name) }
+        # For more info, see here: https://github.com/rails/rails/pull/22506
+        if Rails::VERSION::MAJOR >= 5
+          redirect_back(**{ fallback_location: ActiveAdmin.application.root_to }.merge(options))
+        else
+          redirect_to :back, options
+        end
+      end
+
       scope(I18n.t('active_admin_paranoia.non_archived'), default: true) { |scope| scope.where(resource_class.to_s.camelize.constantize.paranoia_column => resource_class.to_s.camelize.constantize.paranoia_sentinel_value) }
       scope(I18n.t('active_admin_paranoia.archived')) { |scope| scope.unscope(:where => resource_class.to_s.camelize.constantize.paranoia_column).where.not(resource_class.to_s.camelize.constantize.paranoia_column => resource_class.to_s.camelize.constantize.paranoia_sentinel_value) }
     end
